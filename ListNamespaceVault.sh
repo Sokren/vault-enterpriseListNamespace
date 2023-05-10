@@ -15,6 +15,14 @@ fi
 # Define the root endpoint to start calling the API
 root_endpoint="$VAULT_ADDR/v1/sys/namespaces?list=true"
 
+#
+#cmd=$(curl -sX 'GET' $root_endpoint -H 'accept: */*' -H 'X-Vault-Token: '$VAULT_TOKEN -H 'X-Vault-Namespace:'"$1" | grep -p "permision")
+if curl -sX 'GET' $root_endpoint -H 'accept: */*' -H 'X-Vault-Token: '$VAULT_TOKEN -H 'X-Vault-Namespace:'"$1" | grep -q "permission denied" 
+then
+    echo "Error: Permission denied, verify your VAULT_TOKEN"
+    exit 1
+fi
+
 # Define the output file path and name
 output_file="VaultNamespaceList.txt"
 
@@ -24,17 +32,15 @@ then
     echo "Default Root Namespace selected"
     # Create file (or erase)
     echo "/" > "$output_file"
+elif curl -sX 'GET' $root_endpoint -H 'accept: */*' -H 'X-Vault-Token: '$VAULT_TOKEN -H 'X-Vault-Namespace:'"$1" | grep -q "no handler for route"
+then
+    echo "Error: Namespace does not exist"
+    exit 1
 else
-    cmd=$(curl -sX 'GET' $root_endpoint -H 'accept: */*' -H 'X-Vault-Token: '$VAULT_TOKEN -H 'X-Vault-Namespace:'"$1" | cut -d'"' -f2)
-    if [ $cmd == errors ]
-    then
-        echo "Error: Namespace does not exist"
-        exit
-    else
-        # Create file (or erase)
-        echo "$1" > "$output_file" 
-        echo "Namespace: "$1" selected"
-    fi
+    # Create file (or erase)
+    echo "$1" > "$output_file" 
+    echo "Namespace: "$1" selected"
+    
 fi
 
 # Define a function to call the API and extract any child Namespaces
