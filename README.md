@@ -11,6 +11,7 @@ export VAULT_TOKEN=<token>
 ```
 
 :warning: *For the address of Vault do not terminate the line with `/`*
+
 :warning: *For the token you need to have admin role*
 
 Exemple :
